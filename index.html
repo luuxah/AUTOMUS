@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Louez en Toute Confiance | Location de Voitures</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        body: ['Open Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            main: '#2a5a4c',
+                            dark: '#1a3c31',
+                            light: '#4d8071',
+                            bg: '#f8f9fa',
+                            text: '#333333',
+                            accent: '#e6f0ed'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(42, 90, 76, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { color: #333; }
+        .hero-bg { background: linear-gradient(135deg, #ffffff 0%, #f0f4f3 100%); }
+        .search-bar-bg {
+            background-color: #2a5a4c;
+            border-radius: 40px;
+            transform: translateY(30px);
+        }
+        .search-select {
+            background-color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            color: #555;
+            font-size: 0.9rem;
+            width: 100%;
+            appearance: none;
+            cursor: pointer;
+        }
+        .select-wrapper { position: relative; }
+        .select-wrapper::after {
+            content: '\25BC';
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: #555;
+            pointer-events: none;
+        }
+        .btn-primary {
+            background-color: #2a5a4c;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid white;
+        }
+        .btn-primary2 {
+            background-color: #2a5a4c;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid #2a5a4c;
+        }
+        .btn-primary:hover { background-color: white; color: #2a5a4c; }
+        .btn-outline {
+            background-color: transparent;
+            color: #2a5a4c;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 1px solid #2a5a4c;
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover { background-color: #2a5a4c; color: white; }
+        .features-bg { background-color: #eef4f1; }
+        .badge {
+            border: 1px solid #ccc;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            background: white;
+        }
+        .badge .dot { width: 8px; height: 8px; background-color: #52c41a; border-radius: 50%; }
+        .partner-logo {
+            filter: grayscale(100%);
+            opacity: 0.6;
+            transition: all 0.3s;
+            max-height: 40px;
+        }
+        .partner-logo:hover { filter: grayscale(0%); opacity: 1; }
+        .promo-box-1 {
+            background-color: #2a5a4c;
+            color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        .promo-box-2 {
+            background-color: white;
+            border: 1px solid #eaeaea;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        #reservation-modal { transition: opacity 0.3s ease; }
+        #reservation-content { max-height: 90vh; overflow-y: auto; }
+    </style>
+</head>
+<body class="font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="w-full bg-brand-main text-white py-4 px-6 md:px-12 flex justify-between items-center z-50">
+        <div class="flex items-center">
+            <img src="images/Untitled-3.png" alt="STE AUTOMUS" class="w-36 h-10 object-contain">
+        </div>
+        <div class="hidden lg:flex items-center space-x-6 text-sm font-medium">
+            <a href="#home" class="hover:text-gray-300 transition-colors">Accueil</a>
+            <a href="vehicles.html" class="hover:text-gray-300 transition-colors">Nos vehicules</a>
+            <a href="#why-us" class="hover:text-gray-300 transition-colors">Pourquoi nous choisir</a>
+            <a href="#contact" class="hover:text-gray-300 transition-colors">Contact</a>
+            <a href="vehicles.html" class="btn-primary">Reservez maintenant</a>
+        </div>
+        <div class="lg:hidden flex items-center">
+            <button id="mobile-menu-btn" class="text-white focus:outline-none">
+                <i class="ph ph-list text-3xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-brand-main text-white absolute w-full z-40 border-t border-white/20 shadow-xl">
+        <div class="px-4 py-4 flex flex-col space-y-4">
+            <a href="#home" class="block px-3 py-2 text-base font-medium">Accueil</a>
+            <a href="vehicles.html" class="block px-3 py-2 text-base font-medium">Nos vehicules</a>
+            <a href="#why-us" class="block px-3 py-2 text-base font-medium">Pourquoi nous choisir</a>
+            <a href="#contact" class="block px-3 py-2 text-base font-medium">Contact</a>
+            <a href="vehicles.html" class="btn-primary">Reservez maintenant</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative pt-12 pb-24 lg:pt-20 lg:pb-32 overflow-hidden hero-bg">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 relative z-10 flex flex-col lg:flex-row items-center">
+            <div class="w-full lg:w-1/2 lg:pr-12 text-center lg:text-left z-20">
+                <div class="mb-6 flex justify-center lg:justify-start">
+                    <span class="badge">
+                        <span class="dot"></span> voitures haut de gamme
+                    </span>
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-2 tracking-tight">
+                    LOUEZ
+                </h1>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-brand-main leading-tight mb-6">
+                    EN TOUTE CONFIANCE
+                </h2>
+                <p class="text-gray-600 font-body text-lg mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                    Louez une voiture rapidement et facilement. Des véhicules de qualité, des prix compétitifs et un service fiable pour tous vos déplacements au Maroc.
+                </p>
+                <div class="flex flex-row justify-center lg:justify-start gap-4">
+                    <a href="vehicles.html" class="btn-primary2">Réservez</a>
+                    <a href="#contact" class="btn-outline">Contacter</a>
+                </div>
+            </div>
+            <div class="w-[calc(100%+3rem)] md:w-full lg:w-1/2 mt-12 lg:mt-0 relative z-10 right-0 lg:translate-x-3/4">
+                <img src="images/getImage.webp" 
+                     alt="Green SUV" 
+                     class="w-full h-auto object-cover object-right transform md:scale-125 lg:scale-[1.75] origin-right drop-shadow-2xl" />
+            </div>
+        </div>
+
+<!-- SEARCH BAR - CORRIGÉE AVEC FILTRES DYNAMIQUES -->
+<div class="relative mt-8 md:mt-0 md:absolute md:bottom-10 left-0 right-0 w-full px-4 lg:px-0 flex justify-center z-30">
+    <form id="search-form" class="search-bar-bg w-full max-w-5xl py-6 px-8 shadow-2xl flex flex-wrap md:flex-nowrap gap-4 items-center justify-between border-4 border-white/20">
+        
+        <!-- MARQUE -->
+        <div class="w-full md:w-1/5 select-wrapper">
+            <select id="filter-brand" name="brand" class="search-select outline-none">
+                <option value="">Toutes marques</option>
+                <option value="Renault">Renault</option>
+                <option value="Dacia">Dacia</option>
+                <option value="Peugeot">Peugeot</option>
+                <option value="Volkswagen">Volkswagen</option>
+                <option value="Toyota">Toyota</option>
+                <option value="Ford">Ford</option>
+                <option value="Hyundai">Hyundai</option>
+                <option value="Kia">Kia</option>
+                <option value="Mercedes">Mercedes</option>
+            </select>
+        </div>
+        
+        <!-- MODÈLE (mis à jour dynamiquement) -->
+        <div class="w-full md:w-1/5 select-wrapper">
+            <select id="filter-model" name="model" class="search-select outline-none">
+                <option value="">Tous modèles</option>
+            </select>
+        </div>
+        
+        <!-- TYPE DE VÉHICULE -->
+        <div class="w-full md:w-1/5 select-wrapper">
+            <select id="filter-type" name="type" class="search-select outline-none">
+                <option value="">Tous types</option>
+                <option value="economique">Économique</option>
+                <option value="suv">SUV</option>
+                <option value="berline">Berline</option>
+                <option value="citadine">Citadine</option>
+            </select>
+        </div>
+        
+        <!-- PRIX MAXIMUM -->
+        <div class="w-full md:w-1/5 select-wrapper">
+            <select id="filter-price" name="maxPrice" class="search-select outline-none">
+                <option value="">Tous les prix</option>
+                <option value="300">≤ 300 DH</option>
+                <option value="400">≤ 400 DH</option>
+                <option value="500">≤ 500 DH</option>
+                <option value="700">≤ 700 DH</option>
+            </select>
+        </div>
+        
+        <!-- BOUTON RECHERCHER -->
+        <div class="w-full md:w-1/5 flex justify-end">
+            <button type="submit" class="bg-transparent border border-white text-white rounded-full py-2 px-8 font-medium hover:bg-white hover:text-brand-main transition-colors w-full shadow-glow">
+                Rechercher
+            </button>
+        </div>
+    </form>
+</div>
+
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-gray-400 text-sm flex flex-col items-center">
+            <span>Défilez vers le bas</span>
+            <i class="ph ph-arrow-down mt-1"></i>
+        </div>
+    </section>
+
+    <!-- Vehicles Section (aperçu) -->
+    <section id="vehicles" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 uppercase">NOS VEHICULES</h2>
+                    <p class="text-gray-500 font-body">Un large choix pour tous vos besoins</p>
+                </div>
+                <a href="vehicles.html" class="hidden md:inline-flex items-center gap-2 border border-gray-300 rounded-full px-6 py-2 text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                    Voir tous nos vehicules <i class="ph ph-arrow-right"></i>
+                </a>
+            </div>
+
+            <div id="vehicles-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            
+            <div class="mt-8 text-center md:hidden">
+                <a href="vehicles.html" class="inline-flex items-center gap-2 border border-gray-300 rounded-full px-6 py-2 text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                    Voir tous nos vehicules <i class="ph ph-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section id="why-us" class="py-10 features-bg">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <h2 class="text-2xl font-bold text-center text-gray-900 mb-8 uppercase">POURQUOI NOUS CHOISIR ?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="flex items-start gap-4">
+                    <div class="text-brand-main text-3xl"><i class="ph ph-shield-check"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm uppercase">Qualité garantie</h4>
+                        <p class="text-gray-600 text-xs mt-1 leading-tight">Des véhicules bien<br>entretenus</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="text-brand-main text-3xl"><i class="ph ph-headset"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm uppercase">Assistance 24/7</h4>
+                        <p class="text-gray-600 text-xs mt-1 leading-tight">Une équipe à votre<br>écoute</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="text-brand-main text-3xl"><i class="ph ph-percent"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm uppercase">Tarifs transparents</h4>
+                        <p class="text-gray-600 text-xs mt-1 leading-tight">Pas de frais cachés</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="text-brand-main text-3xl"><i class="ph ph-calendar-check"></i></div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm uppercase">Réservation simple</h4>
+                        <p class="text-gray-600 text-xs mt-1 leading-tight">En quelques clics</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Promo Sections -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="promo-box-1 relative min-h-[360px] overflow-hidden flex items-center">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10"></div>
+                <div class="relative z-20 w-full md:w-4/5 p-8">
+                    <h2 class="text-xl font-bold mb-4 leading-tight">CONDUITEZ<br>EN TOUTE SÉRÉNITÉ</h2>
+                    <p class="text-brand-accent text-sm mb-6 leading-relaxed">
+                        Votre confort et votre satisfaction sont notre priorité. Louez en toute confiance, on s'occupe du reste.
+                    </p>
+                    <a href="vehicles.html" class="inline-flex items-center gap-2 bg-white text-brand-main font-bold px-4 py-2 rounded text-sm hover:bg-gray-100 transition-colors">
+                        Découvrir nos services <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="absolute inset-0 w-full h-full">
+                    <img src="images/bent.jpeg" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/400x400/1a3c31/ffffff?text=Woman+Driver';" 
+                         alt="Woman driving" class="absolute inset-0 w-full h-full object-cover object-center">
+                </div>
+            </div>
+
+            <div class="promo-box-2 p-8 flex flex-col md:flex-row items-center justify-between">
+                <div class="md:w-3/5 mb-6 md:mb-0">
+                    <h2 class="text-xl font-bold text-brand-main mb-2">FLEXIBILITÉ ET LIBERTÉ</h2>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Choisissez le véhicule qui vous convient, pour la durée qui vous arrange, au meilleur prix.
+                    </p>
+                    <ul class="text-gray-800 text-sm font-medium space-y-1 mb-6">
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-black rounded-full"></div> Location courte ou longue durée</li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-black rounded-full"></div> Kilométrage adapté à vos besoins</li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-black rounded-full"></div> Options supplémentaires disponibles</li>
+                    </ul>
+                    <a href="vehicles.html" class="inline-flex items-center gap-2 bg-brand-main text-white font-bold px-4 py-2 rounded text-sm hover:bg-brand-dark transition-colors">
+                        Réserver maintenant <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="md:w-2/5 flex justify-end">
+                    <img src="images/dacia1.webp" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/300x200/ffffff/555555?text=Dacia+Duster';" 
+                         alt="Dacia Duster" class="w-full max-w-[600px] h-auto object-contain transform scale-200 translate-x-1/4">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partner Brands -->
+    <section class="py-10 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 text-center">
+            <div class="flex items-center justify-center gap-4 mb-8">
+                <div class="h-px bg-gray-300 w-16 md:w-32"></div>
+                <h3 class="text-xl font-bold text-gray-900 uppercase">NOS MARQUES PARTENAIRES</h3>
+                <div class="h-px bg-gray-300 w-16 md:w-32"></div>
+            </div>
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+                <img src="images/reun.png" alt="Renault" class="partner-logo h-10">
+                <img src="images/logodacia.png" alt="Dacia" class="partner-logo h-6">
+                <img src="images/hyun.png" alt="Hyundai" class="partner-logo h-8">
+                <img src="images/fiat.png" alt="Fiat" class="partner-logo h-12">
+                <img src="images/peug.png" alt="Peugeot" class="partner-logo h-10">
+                <img src="images/cit.png" alt="Citroen" class="partner-logo h-10">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a1/Volkswagen_Logo_till_1995.svg" alt="VW" class="partner-logo h-10">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/47/KIA_logo2.svg" alt="Kia" class="partner-logo h-6">
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" style="padding: 60px 20px; background-color: transparent; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <div style="max-width: 750px; margin: 0 auto; background-color: #133b32; padding: 45px 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(19, 59, 50, 0.25); color: #ffffff;">
+            <h2 style="text-align: center; color: #ffffff; margin-top: 0; margin-bottom: 10px; font-size: 30px; font-weight: 700; letter-spacing: 0.5px;">Contactez-nous</h2>
+            <p style="text-align: center; color: #d0e3de; margin-bottom: 35px; font-size: 15px;">Une question ? Un renseignement ? Laissez-nous un message.</p>
+            
+            <form action="https://api.web3forms.com/submit" method="POST" style="display: flex; flex-direction: column; gap: 22px;">
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 8px;">
+                        <input type="hidden" name="access_key" value="cca3005f-5da6-491b-99bc-5f8094733221">
+                        <label style="font-weight: 500; color: #eaf4f1; font-size: 14px;">Nom complet</label>
+                        <input type="text" name="name" placeholder="Votre nom" required style="padding: 13px 16px; background-color: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 8px; font-size: 14px; color: #ffffff; outline: none;">
+                    </div>
+                    <div style="flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-weight: 500; color: #eaf4f1; font-size: 14px;">Adresse Email</label>
+                        <input type="email" name="email" placeholder="votre@email.com" required style="padding: 13px 16px; background-color: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 8px; font-size: 14px; color: #ffffff; outline: none;">
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="font-weight: 500; color: #eaf4f1; font-size: 14px;">Numéro de téléphone</label>
+                    <input type="tel" name="phone" placeholder="+212 6..." style="padding: 13px 16px; background-color: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 8px; font-size: 14px; color: #ffffff; outline: none;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="font-weight: 500; color: #eaf4f1; font-size: 14px;">Message</label>
+                    <textarea name="message" rows="4" placeholder="Comment pouvons-nous vous aider ?" required style="padding: 13px 16px; background-color: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 8px; font-size: 14px; color: #ffffff; outline: none; resize: vertical;"></textarea>
+                </div>
+                <button type="submit" style="margin-top: 10px; background-color: #ffffff; color: #133b32; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    Envoyer le message
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-brand-main text-white pt-16 pb-6 mt-auto border-t border-brand-dark">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+                <div id="about">
+                    <div class="mb-6">
+                        <img src="images/Untitled-3.png" alt="STE AUTOMUS" class="w-36 h-10 object-contain object-left">
+                    </div>
+                    <p class="text-brand-accent text-sm mb-6 leading-relaxed">
+                        Votre partenaire de confiance pour la location de véhicules en toute sécurité et au meilleur prix.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-white hover:text-gray-300 transition-colors"><i class="ph-fill ph-facebook-logo text-2xl"></i></a>
+                        <a href="#" class="text-white hover:text-gray-300 transition-colors"><i class="ph-fill ph-instagram-logo text-2xl"></i></a>
+                        <a href="#" class="text-white hover:text-gray-300 transition-colors"><i class="ph-fill ph-whatsapp-logo text-2xl"></i></a>
+                    </div>
+                </div>
+                <div class="lg:pl-8 border-l-0 lg:border-l border-white/20">
+                    <h4 class="text-base font-bold mb-6 uppercase">LIENS UTILES</h4>
+                    <ul class="space-y-3 text-sm text-brand-accent font-body">
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> <a href="#home" class="hover:text-white transition-colors">Accueil</a></li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> <a href="vehicles.html" class="hover:text-white transition-colors">Nos véhicules</a></li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> <a href="#why-us" class="hover:text-white transition-colors">Pourquoi nous choisir</a></li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> <a href="#about" class="hover:text-white transition-colors">À propos</a></li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> <a href="#contact" class="hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="lg:pl-8 border-l-0 lg:border-l border-white/20">
+                    <h4 class="text-base font-bold mb-6 uppercase">CONTACT</h4>
+                    <ul class="space-y-4 text-sm text-brand-accent font-body">
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-phone text-lg"></i><span>+212 666 292777</span></li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-envelope-simple text-lg"></i><a href="mailto:contact@louezenconfiance.ma" class="hover:text-white transition-colors">contact@louezenconfiance.ma</a></li>
+                        <li class="flex items-center gap-3"><i class="ph-fill ph-map-pin text-lg"></i><span>Oujda, Maroc</span></li>
+                    </ul>
+                </div>
+                <div class="lg:pl-8 border-l-0 lg:border-l border-white/20">
+                    <h4 class="text-base font-bold mb-6 uppercase">NOS SERVICES</h4>
+                    <ul class="space-y-3 text-sm text-brand-accent font-body">
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> Location de voiture</li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> Assurance incluse</li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> Assistance 24/7</li>
+                        <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-white rounded-full"></div> Livraison flexible</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-white/20 pt-6 text-center">
+                <p class="text-brand-accent text-sm font-body">&copy; 2026 Louez en Toute Confiance. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Réservation -->
+    <div id="reservation-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div id="reservation-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div id="reservation-content" class="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden">
+            <div class="bg-brand-main text-white px-6 py-5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold">Réserver votre véhicule</h2>
+                    <p class="text-white/80 text-sm mt-1">Complétez les informations de votre réservation</p>
+                </div>
+                <button id="close-reservation-modal" class="text-white hover:bg-white/10 rounded-full p-2 transition" aria-label="Fermer">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-center">
+                        <img id="reservation-vehicle-image" src="" alt="" class="w-full h-48 object-contain">
+                    </div>
+                    <div class="flex flex-col justify-center">
+                        <p class="text-brand-main text-sm font-semibold uppercase">Véhicule sélectionné</p>
+                        <h3 id="reservation-vehicle-name" class="text-2xl font-bold text-gray-900 mt-2"></h3>
+                        <p id="reservation-vehicle-description" class="text-gray-500 mt-2"></p>
+                        <div class="mt-4">
+                            <span class="bg-brand-main text-white font-bold px-4 py-2 rounded-lg">
+                                <span id="reservation-vehicle-price">0</span> DH/jour
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="reservation-start-date" class="block text-sm font-semibold text-gray-700 mb-2">Date de départ</label>
+                        <input type="date" id="reservation-start-date" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-main">
+                    </div>
+                    <div>
+                        <label for="reservation-end-date" class="block text-sm font-semibold text-gray-700 mb-2">Date de retour</label>
+                        <input type="date" id="reservation-end-date" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-main">
+                    </div>
+                    <div>
+                        <label for="reservation-start-time" class="block text-sm font-semibold text-gray-700 mb-2">Heure de départ</label>
+                        <input type="time" id="reservation-start-time" value="10:00" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-main">
+                    </div>
+                    <div>
+                        <label for="reservation-end-time" class="block text-sm font-semibold text-gray-700 mb-2">Heure de retour</label>
+                        <input type="time" id="reservation-end-time" value="10:00" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-main">
+                    </div>
+                </div>
+                <div id="reservation-date-error" class="hidden mt-4 bg-red-50 text-red-600 border border-red-200 rounded-lg px-4 py-3 text-sm"></div>
+                <div class="mt-7">
+                    <h3 class="font-bold text-gray-900 text-lg mb-4">Options supplémentaires</h3>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <label class="reservation-option-card border border-gray-200 rounded-xl p-4 flex items-start gap-3 cursor-pointer hover:border-brand-main transition">
+                            <input type="checkbox" class="reservation-option mt-1 accent-brand-main" data-price="50" data-label="Assurance premium">
+                            <div>
+                                <p class="font-semibold text-gray-900">Assurance premium</p>
+                                <p class="text-sm text-gray-500">+50 DH/jour</p>
+                            </div>
+                        </label>
+                        <label class="reservation-option-card border border-gray-200 rounded-xl p-4 flex items-start gap-3 cursor-pointer hover:border-brand-main transition">
+                            <input type="checkbox" class="reservation-option mt-1 accent-brand-main" data-price="100" data-label="Conducteur supplémentaire">
+                            <div>
+                                <p class="font-semibold text-gray-900">Conducteur supplémentaire</p>
+                                <p class="text-sm text-gray-500">+100 DH forfait</p>
+                            </div>
+                        </label>
+                        <label class="reservation-option-card border border-gray-200 rounded-xl p-4 flex items-start gap-3 cursor-pointer hover:border-brand-main transition">
+                            <input type="checkbox" class="reservation-option mt-1 accent-brand-main" data-price="30" data-label="GPS">
+                            <div>
+                                <p class="font-semibold text-gray-900">GPS</p>
+                                <p class="text-sm text-gray-500">+30 DH/jour</p>
+                            </div>
+                        </label>
+                        <label class="reservation-option-card border border-gray-200 rounded-xl p-4 flex items-start gap-3 cursor-pointer hover:border-brand-main transition">
+                            <input type="checkbox" class="reservation-option mt-1 accent-brand-main" data-price="100" data-label="Livraison du véhicule">
+                            <div>
+                                <p class="font-semibold text-gray-900">Livraison du véhicule</p>
+                                <p class="text-sm text-gray-500">+100 DH forfait</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="mt-7 bg-brand-accent rounded-xl p-5">
+                    <h3 class="font-bold text-gray-900 text-lg mb-4">Résumé de la réservation</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Véhicule</span>
+                            <span id="summary-vehicle" class="font-semibold text-gray-900"></span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Durée</span>
+                            <span id="summary-days" class="font-semibold text-gray-900">0 jour</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Location</span>
+                            <span id="summary-rental" class="font-semibold text-gray-900">0 DH</span>
+                        </div>
+                        <div id="summary-options-container" class="hidden border-t border-gray-200 pt-3">
+                            <p class="text-sm font-semibold text-gray-700 mb-2">Options</p>
+                            <div id="summary-options" class="space-y-2"></div>
+                        </div>
+                        <div class="border-t border-gray-300 pt-4 mt-4 flex justify-between items-center">
+                            <span class="text-lg font-bold text-gray-900">Total</span>
+                            <span class="text-2xl font-extrabold text-brand-main"><span id="summary-total">0</span> DH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
+                    <button id="cancel-reservation" class="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition">Annuler</button>
+                    <button id="continue-reservation" class="px-6 py-3 rounded-lg bg-brand-main text-white font-semibold hover:bg-brand-dark transition">Continuer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    // Base de données des véhicules (DOIT être identique à vehicles.html)
+    const vehicles = [
+        { name: "Renault Clio 5", description: "Economique et pratique", price: 350, image: "images/clio.png", brand: "Renault", model: "Clio", type: "citadine" },
+        { name: "Dacia Sandero", description: "Confort et fiabilite", price: 300, image: "images/dacia.png", brand: "Dacia", model: "Sandero", type: "economique" },
+        { name: "Volkswagen Golf 8", description: "Moderne et economique", price: 500, image: "images/volg.png", brand: "Volkswagen", model: "Golf", type: "berline" },
+        { name: "Peugeot 208 GT", description: "Ideale pour les familles", price: 350, image: "images/208.png", brand: "Peugeot", model: "208", type: "citadine" },
+        { name: "Toyota Yaris", description: "Economique et ideale pour la ville", price: 250, image: "images/TOYOTA.png", brand: "Toyota", model: "Yaris", type: "citadine" },
+        { name: "Ford Focus", description: "Confortable et fiable", price: 400, image: "images/ford.jpg", brand: "Ford", model: "Focus", type: "berline" },
+        { name: "Hyundai i20", description: "Pratique et economique", price: 350, image: "images/2.-Hyundai-i20.png", brand: "Hyundai", model: "i20", type: "citadine" },
+        { name: "Renault Megane", description: "Confort et elegance", price: 450, image: "images/megane.png", brand: "Renault", model: "Megane", type: "berline" },
+        { name: "Dacia Logan", description: "Spacieuse et economique", price: 300, image: "images/logan.png", brand: "Dacia", model: "Logan", type: "berline" },
+        { name: "Dacia Duster", description: "SUV robuste et confortable", price: 450, image: "images/duster.png", brand: "Dacia", model: "Duster", type: "suv" },
+        { name: "Renault Captur", description: "SUV moderne et pratique", price: 450, image: "images/captur.png", brand: "Renault", model: "Captur", type: "suv" },
+        { name: "Peugeot 3008", description: "SUV confortable et premium", price: 550, image: "images/3008.png", brand: "Peugeot", model: "3008", type: "suv" },
+        { name: "Volkswagen Polo", description: "Compacte et economique", price: 350, image: "images/polo.png", brand: "Volkswagen", model: "Polo", type: "citadine" },
+        { name: "Hyundai Tucson", description: "SUV spacieux et confortable", price: 550, image: "images/tucson.png", brand: "Hyundai", model: "Tucson", type: "suv" },
+        { name: "Kia Picanto", description: "Petite et parfaite pour la ville", price: 250, image: "images/picanto.png", brand: "Kia", model: "Picanto", type: "citadine" },
+        { name: "Mercedes Classe A", description: "Premium, elegante et confortable", price: 700, image: "images/mercedes-a.png", brand: "Mercedes", model: "Classe A", type: "berline" }
+    ];
+
+    window.vehiclesData = vehicles;
+
+    /* =========================================================
+       METTRE À JOUR LES MODÈLES SELON LA MARQUE
+    ========================================================= */
+    function updateModelsByBrand(brandValue, modelSelect, defaultOption = "Tous modèles") {
+        // Filtrer les modèles selon la marque
+        let models = [];
+        if (brandValue) {
+            models = [...new Set(
+                vehicles.filter(v => v.brand === brandValue).map(v => v.model)
+            )].sort();
+        } else {
+            // Si aucune marque sélectionnée → tous les modèles
+            models = [...new Set(vehicles.map(v => v.model))].sort();
+        }
+
+        // Vider le select (sauf la première option)
+        modelSelect.innerHTML = `<option value="">${defaultOption}</option>`;
+
+        // Ajouter les modèles
+        models.forEach(model => {
+            const opt = document.createElement("option");
+            opt.value = model;
+            opt.textContent = model;
+            modelSelect.appendChild(opt);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Affichage des véhicules sur l'accueil
+        const grid = document.getElementById("vehicles-grid");
+        if (grid) {
+            grid.innerHTML = vehicles.slice(0, 4).map((vehicle, index) => `
+                <div class="bg-white rounded-xl overflow-hidden shadow-soft border border-gray-100 flex flex-col p-4 group hover:shadow-lg transition-shadow">
+                    <div class="h-40 flex items-center justify-center p-4">
+                        <img src="${vehicle.image}" alt="${vehicle.name}" 
+                             class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                             onerror="this.src='https://placehold.co/500x350?text=Image+indisponible'">
+                    </div>
+                    <div class="mt-4 flex flex-col flex-1">
+                        <h3 class="font-bold text-gray-900">${vehicle.name}</h3>
+                        <p class="text-gray-500 text-sm mb-4">${vehicle.description}</p>
+                        <div class="inline-block w-fit bg-brand-main text-white font-bold px-4 py-1.5 rounded text-sm mb-4">${vehicle.price} DH/jour</div>
+                        <button type="button" class="reserve-btn w-full bg-brand-main hover:bg-brand-main/90 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300" data-index="${index}">Réserver maintenant</button>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        /* =========================================================
+           GESTION DU FORMULAIRE DE RECHERCHE
+        ========================================================= */
+        const searchForm = document.getElementById("search-form");
+        const brandSelect = document.getElementById("filter-brand");
+        const modelSelect = document.getElementById("filter-model");
+
+        // Initialiser les modèles (tous affichés par défaut)
+        updateModelsByBrand("", modelSelect);
+
+        // Quand on change la marque → mettre à jour les modèles
+        brandSelect.addEventListener("change", function () {
+            updateModelsByBrand(this.value, modelSelect);
+        });
+
+        // Soumission du formulaire → redirection avec filtres
+        if (searchForm) {
+            searchForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const brand = brandSelect.value;
+                const model = modelSelect.value;
+                const type = document.getElementById("filter-type").value;
+                const maxPrice = document.getElementById("filter-price").value;
+
+                const params = new URLSearchParams();
+                if (brand) params.append("brand", brand);
+                if (model) params.append("model", model);
+                if (type) params.append("type", type);
+                if (maxPrice) params.append("maxPrice", maxPrice);
+
+                window.location.href = "vehicles.html" + (params.toString() ? "?" + params.toString() : "");
+            });
+        }
+
+        /* =========================================================
+           MODAL DE RÉSERVATION (inchangé)
+        ========================================================= */
+        let selectedVehicle = null;
+        const modal = document.getElementById("reservation-modal");
+        const overlay = document.getElementById("reservation-overlay");
+        const closeBtn = document.getElementById("close-reservation-modal");
+        const cancelBtn = document.getElementById("cancel-reservation");
+        const startDate = document.getElementById("reservation-start-date");
+        const endDate = document.getElementById("reservation-end-date");
+        const startTime = document.getElementById("reservation-start-time");
+        const endTime = document.getElementById("reservation-end-time");
+        const error = document.getElementById("reservation-date-error");
+
+        function getDays() {
+            if (!startDate.value || !endDate.value) return 0;
+            const start = new Date(startDate.value + "T00:00:00");
+            const end = new Date(endDate.value + "T00:00:00");
+            return Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        }
+
+        function updateTotal() {
+            if (!selectedVehicle) return;
+            const days = getDays();
+            const rental = days > 0 ? days * selectedVehicle.price : 0;
+            let optionsTotal = 0;
+            const optionsContainer = document.getElementById("summary-options-container");
+            const optionsList = document.getElementById("summary-options");
+            optionsList.innerHTML = "";
+            const checkedOptions = document.querySelectorAll(".reservation-option:checked");
+            checkedOptions.forEach(option => {
+                const price = Number(option.dataset.price);
+                const label = option.dataset.label;
+                const isDaily = label === "Assurance premium" || label === "GPS";
+                const finalPrice = isDaily ? price * days : price;
+                optionsTotal += finalPrice;
+                optionsList.innerHTML += `<div class="flex justify-between text-sm"><span class="text-gray-500">${label}</span><span class="font-semibold">${finalPrice.toLocaleString("fr-FR")} DH</span></div>`;
+            });
+            optionsContainer.classList.toggle("hidden", checkedOptions.length === 0);
+            const total = rental + optionsTotal;
+            document.getElementById("summary-days").textContent = days > 0 ? `${days} ${days === 1 ? "jour" : "jours"}` : "0 jour";
+            document.getElementById("summary-rental").textContent = `${rental.toLocaleString("fr-FR")} DH`;
+            document.getElementById("summary-total").textContent = total.toLocaleString("fr-FR");
+        }
+
+        document.querySelectorAll(".reserve-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const index = Number(this.dataset.index);
+                selectedVehicle = vehicles[index];
+                document.getElementById("reservation-vehicle-name").textContent = selectedVehicle.name;
+                document.getElementById("reservation-vehicle-description").textContent = selectedVehicle.description;
+                document.getElementById("reservation-vehicle-price").textContent = selectedVehicle.price;
+                document.getElementById("reservation-vehicle-image").src = selectedVehicle.image;
+                document.getElementById("summary-vehicle").textContent = selectedVehicle.name;
+                startDate.value = ""; endDate.value = "";
+                startTime.value = "10:00"; endTime.value = "10:00";
+                document.querySelectorAll(".reservation-option").forEach(option => option.checked = false);
+                error.classList.add("hidden");
+                updateTotal();
+                modal.classList.remove("hidden");
+                document.body.style.overflow = "hidden";
+            });
+        });
+
+        function closeModal() {
+            modal.classList.add("hidden");
+            document.body.style.overflow = "";
+        }
+
+        if (closeBtn) closeBtn.addEventListener("click", closeModal);
+        if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+        if (overlay) overlay.addEventListener("click", closeModal);
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
+        });
+
+        const todayStr = new Date().toISOString().split("T")[0];
+        startDate.min = todayStr; endDate.min = todayStr;
+        startDate.addEventListener("change", function () {
+            endDate.min = this.value;
+            if (endDate.value && endDate.value < this.value) endDate.value = "";
+            updateTotal();
+        });
+        endDate.addEventListener("change", function () {
+            if (getDays() <= 0) { error.textContent = "La date de retour doit être après la date de départ."; error.classList.remove("hidden"); }
+            else error.classList.add("hidden");
+            updateTotal();
+        });
+        startTime.addEventListener("change", updateTotal);
+        endTime.addEventListener("change", updateTotal);
+        document.querySelectorAll(".reservation-option").forEach(option => option.addEventListener("change", updateTotal));
+
+        document.getElementById("continue-reservation").addEventListener("click", function () {
+            if (!selectedVehicle) return;
+            if (!startDate.value || !endDate.value) {
+                error.textContent = "Veuillez sélectionner les dates de départ et de retour.";
+                error.classList.remove("hidden"); return;
+            }
+            const days = getDays();
+            if (days <= 0) { error.textContent = "La date de retour doit être après la date de départ."; error.classList.remove("hidden"); return; }
+            closeModal();
+            const messageField = document.querySelector('#contact textarea[name="message"]');
+            if (messageField) {
+                messageField.value = `Bonjour, je souhaite réserver la ${selectedVehicle.name} du ${startDate.value} (${startTime.value}) au ${endDate.value} (${endTime.value}), soit ${days} ${days === 1 ? "jour" : "jours"}. Merci de me confirmer la disponibilité.`;
+            }
+            document.getElementById("contact").scrollIntoView({ behavior: "smooth" });
+        });
+
+        const mobileBtn = document.getElementById("mobile-menu-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+        if (mobileBtn && mobileMenu) {
+            mobileBtn.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+        }
+    });
+</script>
+</body>
+</html>

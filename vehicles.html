@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nos véhicules | Sté AUTOMUS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Montserrat', 'sans-serif'], body: ['Open Sans', 'sans-serif'] },
+                    colors: { brand: { main: '#2a5a4c', dark: '#1a3c31', accent: '#e6f0ed' } },
+                    boxShadow: { soft: '0 4px 20px rgba(0, 0, 0, 0.05)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { color: #333; background: linear-gradient(135deg, #ffffff 0%, #f0f4f3 100%); }
+        .vehicle-card img { transition: transform 0.3s ease; }
+        .vehicle-card:hover img { transform: scale(1.08); }
+        #reservation-modal { transition: opacity 0.3s ease; }
+        #reservation-content { max-height: 90vh; overflow-y: auto; }
+        .filter-select {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #555;
+            font-size: 0.9rem;
+            width: 100%;
+            appearance: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen">
+
+    <!-- NAVBAR -->
+    <nav class="w-full bg-brand-main text-white py-4 px-6 md:px-12 flex justify-between items-center">
+        <a href="index.html#home" class="flex items-center" aria-label="Retour a l'accueil">
+            <img src="images/Untitled-3.png" alt="Sté AUTOMUS" class="w-36 h-10 object-contain">
+        </a>
+        <div class="hidden lg:flex items-center space-x-6 text-sm font-medium">
+            <a href="index.html#home" class="hover:text-gray-300 transition-colors">Accueil</a>
+            <a href="vehicles.html" class="hover:text-gray-300 transition-colors">Nos vehicules</a>
+            <a href="index.html#why-us" class="hover:text-gray-300 transition-colors">Pourquoi nous choisir</a>
+            <a href="index.html#contact" class="hover:text-gray-300 transition-colors">Contact</a>
+            <a href="index.html#contact" class="border border-white rounded-full px-4 py-2 hover:bg-white hover:text-brand-main transition-colors">Reserver maintenant</a>
+        </div>
+        <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none" aria-label="Ouvrir le menu">
+            <i class="ph ph-list text-3xl"></i>
+        </button>
+    </nav>
+
+    <!-- MOBILE MENU -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-brand-main text-white absolute w-full z-40 border-t border-white/20 shadow-xl">
+        <div class="px-4 py-4 flex flex-col space-y-4">
+            <a href="index.html#home" class="block px-3 py-2 text-base font-medium">Accueil</a>
+            <a href="vehicles.html" class="block px-3 py-2 text-base font-medium">Nos vehicules</a>
+            <a href="index.html#why-us" class="block px-3 py-2 text-base font-medium">Pourquoi nous choisir</a>
+            <a href="index.html#contact" class="block px-3 py-2 text-base font-medium">Contact</a>
+            <a href="index.html#contact" class="inline-block border border-white px-4 py-2 rounded-full text-center mt-2 w-max">Reserver maintenant</a>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <main class="max-w-7xl mx-auto px-6 lg:px-12 py-16">
+
+        <div class="text-center mb-12">
+            <p class="text-brand-main text-sm font-bold uppercase tracking-wide mb-3">Sté AUTOMUS</p>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 uppercase mb-4">Tous nos vehicules</h1>
+            <p class="text-gray-600 font-body max-w-2xl mx-auto">
+                Choisissez le vehicule qui correspond a vos besoins, avec des tarifs transparents et un service fiable.
+            </p>
+        </div>
+
+        <!-- FILTRES -->
+        <div class="bg-white rounded-2xl shadow-soft border border-gray-100 p-6 mb-10">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="ph ph-funnel text-brand-main text-xl"></i>
+                <h2 class="font-bold text-gray-900 text-lg">Filtrer les véhicules</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Marque</label>
+                    <select id="filter-brand" class="filter-select">
+                        <option value="">Toutes marques</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Modèle</label>
+                    <select id="filter-model" class="filter-select">
+                        <option value="">Tous modèles</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+                    <select id="filter-type" class="filter-select">
+                        <option value="">Tous types</option>
+                        <option value="economique">Économique</option>
+                        <option value="suv">SUV</option>
+                        <option value="berline">Berline</option>
+                        <option value="citadine">Citadine</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Prix maximum</label>
+                    <select id="filter-price" class="filter-select">
+                        <option value="">Tous les prix</option>
+                        <option value="300">≤ 300 DH</option>
+                        <option value="400">≤ 400 DH</option>
+                        <option value="500">≤ 500 DH</option>
+                        <option value="700">≤ 700 DH</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-3 items-center">
+                <button id="apply-filters" class="bg-brand-main text-white font-semibold px-6 py-2 rounded-lg hover:bg-brand-dark transition">
+                    <i class="ph ph-magnifying-glass inline mr-2"></i>Appliquer les filtres
+                </button>
+                <button id="reset-filters" class="border border-gray-300 text-gray-700 font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition">
+                    <i class="ph ph-arrow-counter-clockwise inline mr-2"></i>Réinitialiser
+                </button>
+                <span id="filter-result-count" class="text-sm text-gray-500 ml-auto"></span>
+            </div>
+        </div>
+
+        <!-- AUCUN RÉSULTAT -->
+        <div id="no-results" class="hidden text-center py-16">
+            <i class="ph ph-car text-6xl text-gray-300"></i>
+            <h3 class="text-xl font-bold text-gray-700 mt-4">Aucun véhicule ne correspond à vos critères</h3>
+            <p class="text-gray-500 mt-2">Essayez de modifier vos filtres ou de les réinitialiser.</p>
+            <button onclick="document.getElementById('reset-filters').click()" class="mt-6 bg-brand-main text-white font-semibold px-6 py-2 rounded-lg hover:bg-brand-dark transition">
+                Voir tous les véhicules
+            </button>
+        </div>
+
+        <!-- GRILLE VÉHICULES -->
+        <div id="vehicles-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-main text-white py-6 text-center text-sm">
+        <p>&copy; 2026 STE AUTOMUS. Tous droits reserves.</p>
+    </footer>
+
+    <!-- =====================================================
+         RESERVATION MODAL
+    ===================================================== -->
+    <div id="reservation-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div id="reservation-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div id="reservation-content" class="relative z-10 bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden">
+            <div class="bg-brand-main text-white px-6 py-5 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold">Réserver votre véhicule</h2>
+                    <p class="text-white/80 text-sm mt-1">Complétez les informations de votre réservation</p>
+                </div>
+                <button id="close-reservation-modal" class="text-white hover:bg-white/10 rounded-full p-2 transition" aria-label="Fermer">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-center">
+                        <img id="reservation-vehicle-image" src="" alt="" class="w-full h-48 object-contain">
+                    </div>
+                    <div class="flex flex-col justify-center">
+                        <p class="text-brand-main text-sm font-semibold uppercase">Véhicule sélectionné</p>
+                        <h3 id="reservation-vehicle-name" class="text-2xl font-bold text-gray-900 mt-2"></h3>
+                        <p id="reservation-vehicle-description" class="text-gray-500 mt-2"></p>
+                        <div class="mt-4">
+                            <span class="bg-brand-main text-white font-bold px-4 py-2 rounded-lg">
+                                <span id="reservation-vehicle-price">0</span> DH/jour
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-5">
+                    <div>
+                        <label for="reservation-start-date" class="block text-sm font-semibold text-gray-700 mb-2">Date de départ</label>
+                        <input type="date" id="reservation-start-date" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-main">
+                    </div>
+                    <div>
+                        <label for="reservation-end-date" class="block text-sm font-semibold text-gray-700 mb-2">Date de retour</label>
+                        <input type="date" id="reservation-end-date" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-main">
+                    </div>
+                    <div>
+                        <label for="reservation-start-time" class="block text-sm font-semibold text-gray-700 mb-2">Heure de départ</label>
+                        <input type="time" id="reservation-start-time" value="10:00" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-main">
+                    </div>
+                    <div>
+                        <label for="reservation-end-time" class="block text-sm font-semibold text-gray-700 mb-2">Heure de retour</label>
+                        <input type="time" id="reservation-end-time" value="10:00" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-main">
+                    </div>
+                </div>
+                <div id="reservation-date-error" class="hidden mt-4 bg-red-50 text-red-600 border border-red-200 rounded-lg px-4 py-3 text-sm"></div>
+                <div class="mt-7">
+                    <h3 class="font-bold text-gray-900 text-lg mb-4">Options supplémentaires</h3>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <label class="reservation-option-card border border-gray-200 rounded-xl p-4 flex items-start gap-3 cursor-pointer hover:border-brand-main transition">
+                            <input type="checkbox" class="reservation-option mt-1 accent-brand-main" data-price="50" data-label="Assurance premium">
+                            <div><p class="font-semibold text-gray-900">Assurance premium</p><p class="text-sm text-gray-500">+50 DH/jour</p></div>
+                        </label>
+                        <label class="reservation-option-card border border-gray-200 rounded-xl p-4 flex items-start gap-3 cursor-pointer hover:border-brand-main transition">
+                            <input type="checkbox" class="reservation-option mt-1 accent-brand-main" data-price="100" data-label="Conducteur supplémentaire">
+                            <div><p class="font-semibold text-gray-900">Conducteur supplémentaire</p><p class="text-sm text-gray-500">+100 DH forfait</p></div>
+                        </label>
+                        <label class="reservation-option-card border border-gray-200 rounded-xl p-4 flex items-start gap-3 cursor-pointer hover:border-brand-main transition">
+                            <input type="checkbox" class="reservation-option mt-1 accent-brand-main" data-price="30" data-label="GPS">
+                            <div><p class="font-semibold text-gray-900">GPS</p><p class="text-sm text-gray-500">+30 DH/jour</p></div>
+                        </label>
+                        <label class="reservation-option-card border border-gray-200 rounded-xl p-4 flex items-start gap-3 cursor-pointer hover:border-brand-main transition">
+                            <input type="checkbox" class="reservation-option mt-1 accent-brand-main" data-price="100" data-label="Livraison du véhicule">
+                            <div><p class="font-semibold text-gray-900">Livraison du véhicule</p><p class="text-sm text-gray-500">+100 DH forfait</p></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="mt-7 bg-brand-accent rounded-xl p-5">
+                    <h3 class="font-bold text-gray-900 text-lg mb-4">Résumé de la réservation</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">Véhicule</span><span id="summary-vehicle" class="font-semibold text-gray-900"></span></div>
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">Durée</span><span id="summary-days" class="font-semibold text-gray-900">0 jour</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">Location</span><span id="summary-rental" class="font-semibold text-gray-900">0 DH</span></div>
+                        <div id="summary-options-container" class="hidden border-t border-gray-200 pt-3">
+                            <p class="text-sm font-semibold text-gray-700 mb-2">Options</p>
+                            <div id="summary-options" class="space-y-2"></div>
+                        </div>
+                        <div class="border-t border-gray-300 pt-4 mt-4 flex justify-between items-center">
+                            <span class="text-lg font-bold text-gray-900">Total</span>
+                            <span class="text-2xl font-extrabold text-brand-main"><span id="summary-total">0</span> DH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
+                    <button id="cancel-reservation" class="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition">Annuler</button>
+                    <button id="continue-reservation" class="px-6 py-3 rounded-lg bg-brand-main text-white font-semibold hover:bg-brand-dark transition">Continuer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    /* =========================================================
+       BASE DE DONNÉES DES VÉHICULES
+    ========================================================= */
+    const vehicles = [
+        { name: "Renault Clio 5", description: "Economique et pratique", price: 350, image: "images/clio.png", brand: "Renault", model: "Clio", type: "citadine" },
+        { name: "Dacia Sandero", description: "Confort et fiabilite", price: 300, image: "images/dacia.png", brand: "Dacia", model: "Sandero", type: "economique" },
+        { name: "Volkswagen Golf 8", description: "Moderne et economique", price: 500, image: "images/volg.png", brand: "Volkswagen", model: "Golf", type: "berline" },
+        { name: "Peugeot 208 GT", description: "Ideale pour les familles", price: 350, image: "images/208.png", brand: "Peugeot", model: "208", type: "citadine" },
+        { name: "Toyota Yaris", description: "Economique et ideale pour la ville", price: 250, image: "images/TOYOTA.png", brand: "Toyota", model: "Yaris", type: "citadine" },
+        { name: "Ford Focus", description: "Confortable et fiable", price: 400, image: "images/ford.jpg", brand: "Ford", model: "Focus", type: "berline" },
+        { name: "Hyundai i20", description: "Pratique et economique", price: 350, image: "images/2.-Hyundai-i20.png", brand: "Hyundai", model: "i20", type: "citadine" },
+        { name: "Renault Megane", description: "Confort et elegance", price: 450, image: "images/megane.png", brand: "Renault", model: "Megane", type: "berline" },
+        { name: "Dacia Logan", description: "Spacieuse et economique", price: 300, image: "images/logan.png", brand: "Dacia", model: "Logan", type: "berline" },
+        { name: "Dacia Duster", description: "SUV robuste et confortable", price: 450, image: "images/duster.png", brand: "Dacia", model: "Duster", type: "suv" },
+        { name: "Renault Captur", description: "SUV moderne et pratique", price: 450, image: "images/captur.png", brand: "Renault", model: "Captur", type: "suv" },
+        { name: "Peugeot 3008", description: "SUV confortable et premium", price: 550, image: "images/3008.png", brand: "Peugeot", model: "3008", type: "suv" },
+        { name: "Volkswagen Polo", description: "Compacte et economique", price: 350, image: "images/polo.png", brand: "Volkswagen", model: "Polo", type: "citadine" },
+        { name: "Hyundai Tucson", description: "SUV spacieux et confortable", price: 550, image: "images/tucson.png", brand: "Hyundai", model: "Tucson", type: "suv" },
+        { name: "Kia Picanto", description: "Petite et parfaite pour la ville", price: 250, image: "images/picanto.png", brand: "Kia", model: "Picanto", type: "citadine" },
+        { name: "Mercedes Classe A", description: "Premium, elegante et confortable", price: 700, image: "images/mercedes-a.png", brand: "Mercedes", model: "Classe A", type: "berline" }
+    ];
+
+    let selectedVehicle = null;
+
+    /* =========================================================
+       METTRE À JOUR LES MODÈLES SELON LA MARQUE
+    ========================================================= */
+    function updateModelsByBrand(brandValue, modelSelect, selectedModel = "", defaultOption = "Tous modèles") {
+        let models = [];
+        if (brandValue) {
+            models = [...new Set(
+                vehicles.filter(v => v.brand === brandValue).map(v => v.model)
+            )].sort();
+        } else {
+            models = [...new Set(vehicles.map(v => v.model))].sort();
+        }
+
+        modelSelect.innerHTML = `<option value="">${defaultOption}</option>`;
+
+        models.forEach(model => {
+            const opt = document.createElement("option");
+            opt.value = model;
+            opt.textContent = model;
+            if (model === selectedModel) opt.selected = true;
+            modelSelect.appendChild(opt);
+        });
+    }
+
+    /* =========================================================
+       INITIALISATION
+    ========================================================= */
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const brandSelect = document.getElementById("filter-brand");
+        const modelSelect = document.getElementById("filter-model");
+        const typeSelect = document.getElementById("filter-type");
+        const priceSelect = document.getElementById("filter-price");
+
+        // 1. Remplir le select MARQUE
+        const brands = [...new Set(vehicles.map(v => v.brand))].sort();
+        brands.forEach(brand => {
+            const opt = document.createElement("option");
+            opt.value = brand;
+            opt.textContent = brand;
+            brandSelect.appendChild(opt);
+        });
+
+        // 2. Lire les paramètres URL
+        const params = new URLSearchParams(window.location.search);
+        const urlBrand = params.get("brand") || "";
+        const urlModel = params.get("model") || "";
+        const urlType = params.get("type") || "";
+        const urlPrice = params.get("maxPrice") || "";
+
+        if (urlBrand) brandSelect.value = urlBrand;
+        if (urlType) typeSelect.value = urlType;
+        if (urlPrice) priceSelect.value = urlPrice;
+
+        // 3. Mettre à jour les modèles selon la marque
+        updateModelsByBrand(brandSelect.value, modelSelect, urlModel);
+
+        // 4. Afficher les véhicules filtrés
+        applyFilters();
+
+        /* =========================================================
+           FONCTION DE FILTRAGE
+        ========================================================= */
+        function applyFilters() {
+            const brand = brandSelect.value;
+            const model = modelSelect.value;
+            const type = typeSelect.value;
+            const maxPrice = priceSelect.value;
+
+            let filtered = [...vehicles];
+
+            if (brand) filtered = filtered.filter(v => v.brand === brand);
+            if (model) filtered = filtered.filter(v => v.model === model);
+            if (type) filtered = filtered.filter(v => v.type === type);
+            if (maxPrice) filtered = filtered.filter(v => v.price <= Number(maxPrice));
+
+            renderVehicles(filtered);
+
+            const countEl = document.getElementById("filter-result-count");
+            if (filtered.length === 0) {
+                countEl.textContent = "Aucun véhicule trouvé";
+            } else if (filtered.length === vehicles.length) {
+                countEl.textContent = `${filtered.length} véhicules disponibles`;
+            } else {
+                countEl.textContent = `${filtered.length} véhicule${filtered.length > 1 ? "s" : ""} trouvé${filtered.length > 1 ? "s" : ""}`;
+            }
+        }
+
+        /* =========================================================
+           AFFICHAGE DES VÉHICULES
+        ========================================================= */
+        function renderVehicles(list) {
+            const grid = document.getElementById("vehicles-grid");
+            const noResults = document.getElementById("no-results");
+
+            if (list.length === 0) {
+                grid.innerHTML = "";
+                noResults.classList.remove("hidden");
+                return;
+            }
+
+            noResults.classList.add("hidden");
+
+            grid.innerHTML = list.map((vehicle) => {
+                const originalIndex = vehicles.indexOf(vehicle);
+                return `
+                    <div class="vehicle-card bg-white rounded-2xl overflow-hidden shadow-soft border border-gray-100 p-4 flex flex-col group hover:shadow-xl transition-all duration-300">
+                        <div class="h-52 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden">
+                            <img src="${vehicle.image}" alt="${vehicle.name}"
+                                 class="max-w-full max-h-full object-contain group-hover:scale-105 transition duration-300"
+                                 onerror="this.src='https://placehold.co/500x350?text=Image+indisponible'">
+                        </div>
+                        <div class="pt-4 flex-1">
+                            <div class="flex items-start justify-between">
+                                <h3 class="text-lg font-bold text-gray-900">${vehicle.name}</h3>
+                                <span class="text-xs bg-brand-accent text-brand-main px-2 py-1 rounded font-semibold uppercase">${vehicle.type}</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">${vehicle.description}</p>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xl font-bold text-brand-main">${vehicle.price} DH</span>
+                                <span class="text-sm text-gray-500">/ jour</span>
+                            </div>
+                            <button type="button"
+                                    class="reserve-btn w-full bg-brand-main hover:bg-brand-dark text-white font-semibold py-3 rounded-xl transition duration-300"
+                                    data-index="${originalIndex}">
+                                Réserver maintenant
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            attachReserveButtons();
+        }
+
+        /* =========================================================
+           BOUTONS DE FILTRE
+        ========================================================= */
+        document.getElementById("apply-filters").addEventListener("click", applyFilters);
+
+        document.getElementById("reset-filters").addEventListener("click", function () {
+            brandSelect.value = "";
+            typeSelect.value = "";
+            priceSelect.value = "";
+            updateModelsByBrand("", modelSelect);
+            window.history.replaceState({}, "", "vehicles.html");
+            applyFilters();
+        });
+
+        brandSelect.addEventListener("change", function () {
+            updateModelsByBrand(this.value, modelSelect);
+            applyFilters();
+        });
+
+        modelSelect.addEventListener("change", applyFilters);
+        typeSelect.addEventListener("change", applyFilters);
+        priceSelect.addEventListener("change", applyFilters);
+
+        /* =========================================================
+           MODAL DE RÉSERVATION
+        ========================================================= */
+        const modal = document.getElementById("reservation-modal");
+        const overlay = document.getElementById("reservation-overlay");
+        const closeBtn = document.getElementById("close-reservation-modal");
+        const cancelBtn = document.getElementById("cancel-reservation");
+        const startDate = document.getElementById("reservation-start-date");
+        const endDate = document.getElementById("reservation-end-date");
+        const startTime = document.getElementById("reservation-start-time");
+        const endTime = document.getElementById("reservation-end-time");
+        const error = document.getElementById("reservation-date-error");
+
+        function getDays() {
+            if (!startDate.value || !endDate.value) return 0;
+            const s = new Date(startDate.value + "T00:00:00");
+            const e = new Date(endDate.value + "T00:00:00");
+            return Math.ceil((e - s) / (1000 * 60 * 60 * 24));
+        }
+
+        function updateTotal() {
+            if (!selectedVehicle) return;
+            const days = getDays();
+            const rental = days > 0 ? days * selectedVehicle.price : 0;
+            let optionsTotal = 0;
+            const optionsContainer = document.getElementById("summary-options-container");
+            const optionsList = document.getElementById("summary-options");
+            optionsList.innerHTML = "";
+            const checkedOptions = document.querySelectorAll(".reservation-option:checked");
+
+            checkedOptions.forEach(option => {
+                const price = Number(option.dataset.price);
+                const label = option.dataset.label;
+                const isDaily = label === "Assurance premium" || label === "GPS";
+                const finalPrice = isDaily ? price * days : price;
+                optionsTotal += finalPrice;
+                optionsList.innerHTML += `<div class="flex justify-between text-sm"><span class="text-gray-500">${label}</span><span class="font-semibold">${finalPrice.toLocaleString("fr-FR")} DH</span></div>`;
+            });
+
+            optionsContainer.classList.toggle("hidden", checkedOptions.length === 0);
+
+            const total = rental + optionsTotal;
+
+            document.getElementById("summary-days").textContent = days > 0 ? `${days} ${days === 1 ? "jour" : "jours"}` : "0 jour";
+            document.getElementById("summary-rental").textContent = `${rental.toLocaleString("fr-FR")} DH`;
+            document.getElementById("summary-total").textContent = total.toLocaleString("fr-FR");
+        }
+
+        function attachReserveButtons() {
+            document.querySelectorAll(".reserve-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    const index = Number(this.dataset.index);
+                    selectedVehicle = vehicles[index];
+
+                    document.getElementById("reservation-vehicle-name").textContent = selectedVehicle.name;
+                    document.getElementById("reservation-vehicle-description").textContent = selectedVehicle.description;
+                    document.getElementById("reservation-vehicle-price").textContent = selectedVehicle.price;
+                    document.getElementById("reservation-vehicle-image").src = selectedVehicle.image;
+                    document.getElementById("summary-vehicle").textContent = selectedVehicle.name;
+
+                    startDate.value = ""; endDate.value = "";
+                    startTime.value = "10:00"; endTime.value = "10:00";
+                    document.querySelectorAll(".reservation-option").forEach(o => o.checked = false);
+                    error.classList.add("hidden");
+                    updateTotal();
+
+                    modal.classList.remove("hidden");
+                    document.body.style.overflow = "hidden";
+                });
+            });
+        }
+
+        function closeModal() {
+            modal.classList.add("hidden");
+            document.body.style.overflow = "";
+        }
+
+        closeBtn.addEventListener("click", closeModal);
+        cancelBtn.addEventListener("click", closeModal);
+        overlay.addEventListener("click", closeModal);
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
+        });
+
+        const todayStr = new Date().toISOString().split("T")[0];
+        startDate.min = todayStr;
+        endDate.min = todayStr;
+
+        startDate.addEventListener("change", function () {
+            endDate.min = this.value;
+            if (endDate.value && endDate.value < this.value) endDate.value = "";
+            updateTotal();
+        });
+
+        endDate.addEventListener("change", function () {
+            if (getDays() <= 0) {
+                error.textContent = "La date de retour doit être après la date de départ.";
+                error.classList.remove("hidden");
+            } else {
+                error.classList.add("hidden");
+            }
+            updateTotal();
+        });
+
+        startTime.addEventListener("change", updateTotal);
+        endTime.addEventListener("change", updateTotal);
+        document.querySelectorAll(".reservation-option").forEach(o => o.addEventListener("change", updateTotal));
+
+        /* =========================================================
+           CONTINUER → REDIRECTION VERS reservation.html
+        ========================================================= */
+        document.getElementById("continue-reservation").addEventListener("click", function () {
+            if (!selectedVehicle) return;
+            if (!startDate.value || !endDate.value) {
+                error.textContent = "Veuillez sélectionner les dates de départ et de retour.";
+                error.classList.remove("hidden");
+                return;
+            }
+            const days = getDays();
+            if (days <= 0) {
+                error.textContent = "La date de retour doit être après la date de départ.";
+                error.classList.remove("hidden");
+                return;
+            }
+
+            // Récupérer les options cochées
+            const options = [];
+            document.querySelectorAll(".reservation-option:checked").forEach(opt => {
+                options.push({
+                    label: opt.dataset.label,
+                    price: opt.dataset.price
+                });
+            });
+
+            // Construire les paramètres URL
+            const params = new URLSearchParams({
+                vehicle: selectedVehicle.name,
+                price: selectedVehicle.price,
+                image: selectedVehicle.image,
+                description: selectedVehicle.description,
+                startDate: startDate.value,
+                endDate: endDate.value,
+                startTime: startTime.value,
+                endTime: endTime.value,
+                days: days,
+                options: JSON.stringify(options)
+            });
+
+            // Redirection vers la page de réservation
+            window.location.href = "reservation.html?" + params.toString();
+        });
+
+        /* =========================================================
+           MENU MOBILE
+        ========================================================= */
+        const mobileBtn = document.getElementById("mobile-menu-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+        if (mobileBtn && mobileMenu) {
+            mobileBtn.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+        }
+    });
+    </script>
+
+</body>
+</html>
